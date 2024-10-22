@@ -16,6 +16,6 @@
 
 - name: Run Docker Compose
   shell: >
-    GIT_REPO={{ github_owner }}/{{ github_repo }} RUNNER_TOKEN={{ runner_token }} docker compose up -d
+    GIT_REPO={{ github_owner }}/{{ github_repo }} RUNNER_TOKEN={{ runner_token }} docker compose up
   args:
     chdir: "{{ ansible_user_dir }}/docker-compose"
