@@ -7,6 +7,6 @@
 
 - name: Copy compose.yml
   copy:
-    src: "/home/scelle/MVC-DevOps/compose.yml"
+    src: "/home/scelle/MVC-DevOps/MVC-DevOps/compose.yml"
     dest: "{{ ansible_user_dir }}/docker-compose/compose.yml"
     mode: '0644'
