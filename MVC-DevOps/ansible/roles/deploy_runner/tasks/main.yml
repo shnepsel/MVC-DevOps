@@ -18,4 +18,4 @@
   shell: >
     GIT_REPO={{ github_owner }}/{{ github_repo }} RUNNER_TOKEN={{ runner_token }} docker compose up -d
   args:
-    chdir: "{{ ansible_user_dir }}/compose"
+    chdir: "{{ ansible_user_dir }}/docker-compose"
