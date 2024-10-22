@@ -1,0 +1,42 @@
+services:
+  runner:
+    image: scelle/github-actions-self-hosted-runner
+    restart: always
+    environment:
+      - REPO=${GIT_REPO}
+      - TOKEN=${RUNNER_TOKEN}
+      - RUNNER_NAME=my-self-hosted-runner
+      - RUNNER_WORKDIR=/tmp/runner
+    volumes:
+      - ./runner_data:/runner
+    command: >
+      bash -c "
+      mkdir -p actions-runner && cd actions-runner &&
+      curl -o actions-runner-linux-x64-2.319.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.319.1/actions-runner-linux-x64-2.319.1.tar.gz &&
+      echo '3f6efb7488a183e291fc2c62876e14c9ee732864173734facc85a1bfb1744464  actions-runner-linux-x64-2.319.1.tar.gz' | shasum -a 256 -c &&
+      tar xzf ./actions-runner-linux-x64-2.319.1.tar.gz &&
+      ./config.sh --url https://github.com/${REPO} --token ${TOKEN} --unattended --replace &&
+      ./run.sh"
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.35'
+          memory: 300M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: bgrt
+      POSTGRES_USER: shnepsel
+      POSTGRES_PASSWORD: 111
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

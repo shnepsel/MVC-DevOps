@@ -1,0 +1,12 @@
+---
+- name: Create Docker Compose directory
+  file:
+    path: "{{ ansible_user_dir }}/compose"
+    state: directory
+    mode: '0755'
+
+- name: Copy compose.yml
+  copy:
+    src: "/home/scelle/test/compose.yml"
+    dest: "{{ ansible_user_dir }}/compose/compose.yml"
+    mode: '0644'

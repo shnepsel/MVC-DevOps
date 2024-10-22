@@ -1,0 +1,13 @@
+---
+- hosts: servers
+  become: true
+  roles:
+    - manage_files
+    - install_docker
+    - deploy_runner
+  vars:
+    github_owner: "shnepsel"
+    github_repo: "test"
+    github_personal_access_token: "{{ vault_github_personal_access_token }}"
+  vars_files:
+    - vault.yml

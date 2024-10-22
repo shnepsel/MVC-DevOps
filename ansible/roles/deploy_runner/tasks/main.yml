@@ -1,0 +1,21 @@
+---
+- name: Get GitHub runner token using API
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/{{ github_owner }}/{{ github_repo }}/actions/runners/registration-token"
+    method: POST
+    headers:
+      Accept: "application/vnd.github+json"
+      Authorization: "Bearer {{ github_personal_access_token }}"
+      X-GitHub-Api-Version: "2022-11-28"
+    status_code: [200, 201]
+  register: token_response
+
+- name: Save token to variable
+  set_fact:
+    runner_token: "{{ token_response.json.token }}"
+
+- name: Run Docker Compose
+  shell: >
+    GIT_REPO={{ github_owner }}/{{ github_repo }} RUNNER_TOKEN={{ runner_token }} docker compose up -d
+  args:
+    chdir: "{{ ansible_user_dir }}/compose"
