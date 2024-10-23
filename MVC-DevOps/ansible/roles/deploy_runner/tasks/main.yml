@@ -14,6 +14,13 @@
   set_fact:
     runner_token: "{{ token_response.json.token }}"
 
+- name: Write environment variables to .env file
+  ansible.builtin.copy:
+    dest: "{{ ansible_user_dir }}/docker-compose/.env"
+    content: |
+      GIT_REPO={{ github_owner }}/{{ github_repo }}
+      RUNNER_TOKEN={{ runner_token }}
+
 - name: Run Docker Compose
   shell: >
     GIT_REPO={{ github_owner }}/{{ github_repo }} RUNNER_TOKEN={{ runner_token }} docker compose up -d
