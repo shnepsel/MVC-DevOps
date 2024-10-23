@@ -3,8 +3,8 @@ services:
     image: scelle/github-actions-self-hosted-runner
     restart: always
     environment:
-      - REPO=${GIT_REPO}
-      - TOKEN=${RUNNER_TOKEN}
+      #- REPO=${GIT_REPO}
+      #- TOKEN=${RUNNER_TOKEN}
       - RUNNER_NAME=my-self-hosted-runner
       - RUNNER_WORKDIR=/tmp/runner
     volumes:
