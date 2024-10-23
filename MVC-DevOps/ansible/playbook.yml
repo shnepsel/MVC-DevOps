@@ -7,7 +7,7 @@
     - deploy_runner
   vars:
     github_owner: "shnepsel"
-    github_repo: "test"
+    github_repo: "MVC-DevOps"
     github_personal_access_token: "{{ vault_github_personal_access_token }}"
   vars_files:
     - vault.yml
