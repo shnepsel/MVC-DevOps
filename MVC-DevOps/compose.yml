@@ -4,9 +4,7 @@ services:
     container_name: actions_runner
     restart: always
     environment:
-      #- REPO=${GIT_REPO}
-      #- TOKEN=${RUNNER_TOKEN}
-      - RUNNER_NAME=my-self-hosted-runner
+      #- RUNNER_NAME=my-self-hosted-runner
       - RUNNER_WORKDIR=/tmp/runner
     volumes:
       - ./runner_data:/runner

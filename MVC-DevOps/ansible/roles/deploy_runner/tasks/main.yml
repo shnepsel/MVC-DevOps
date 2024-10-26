@@ -20,22 +20,19 @@
   set_fact:
     runner_token: "{{ token_response.json.token }}"
 
+- name: Get hostname
+  command: hostname
+  register: hostname_result
+
 - name: Write environment variables to .env file
   ansible.builtin.copy:
     dest: "{{ ansible_user_dir }}/docker-compose/.env"
     content: |
       GIT_REPO={{ github_owner }}/{{ github_repo }}
       RUNNER_TOKEN={{ runner_token }}
+      RUNNER_NAME={{ hostname_result.stdout }}-runner  # Добавлено имя хоста для раннера
 
-- name: Get hostname
-  command: hostname
-  register: hostname_result
-
-- name: Run Docker Compose with specific runner name
-  shell: >
-    GIT_REPO={{ github_owner }}/{{ github_repo }} 
-    RUNNER_TOKEN={{ runner_token }} 
-    RUNNER_NAME={{ hostname_result.stdout }}-runner  # Используем имя хоста для раннера
-    docker compose up -d
+- name: Run Docker Compose
+  shell: docker compose up -d
   args:
     chdir: "{{ ansible_user_dir }}/docker-compose"
