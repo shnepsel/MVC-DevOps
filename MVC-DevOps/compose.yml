@@ -1,6 +1,7 @@
 services:
   runner:
     image: scelle/github-actions-self-hosted-runner
+    container_name: actions_runner
     restart: always
     environment:
       #- REPO=${GIT_REPO}

@@ -10,6 +10,12 @@
     status_code: [200, 201]
   register: token_response
 
+- name: Check if token was retrieved successfully
+  assert:
+    that:
+      - token_response.status in [200, 201]
+    fail_msg: "Failed to retrieve GitHub runner token"
+
 - name: Save token to variable
   set_fact:
     runner_token: "{{ token_response.json.token }}"
@@ -21,8 +27,15 @@
       GIT_REPO={{ github_owner }}/{{ github_repo }}
       RUNNER_TOKEN={{ runner_token }}
 
-- name: Run Docker Compose
+- name: Get hostname
+  command: hostname
+  register: hostname_result
+
+- name: Run Docker Compose with specific runner name
   shell: >
-    GIT_REPO={{ github_owner }}/{{ github_repo }} RUNNER_TOKEN={{ runner_token }} docker compose up -d
+    GIT_REPO={{ github_owner }}/{{ github_repo }} 
+    RUNNER_TOKEN={{ runner_token }} 
+    RUNNER_NAME={{ hostname_result.stdout }}-runner  # Используем имя хоста для раннера
+    docker compose up -d
   args:
     chdir: "{{ ansible_user_dir }}/docker-compose"
