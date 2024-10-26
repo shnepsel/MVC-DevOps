@@ -4,7 +4,6 @@ services:
     container_name: actions_runner
     restart: always
     environment:
-      #- RUNNER_NAME=my-self-hosted-runner
       - RUNNER_WORKDIR=/tmp/runner
     volumes:
       - ./runner_data:/runner

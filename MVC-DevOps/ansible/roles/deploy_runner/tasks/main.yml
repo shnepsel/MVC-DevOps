@@ -20,7 +20,7 @@
   set_fact:
     runner_token: "{{ token_response.json.token }}"
 
-- name: Get hostname
+- name: Get hostname for runner name
   command: hostname
   register: hostname_result
 
