@@ -30,7 +30,7 @@
     content: |
       GIT_REPO={{ github_owner }}/{{ github_repo }}
       RUNNER_TOKEN={{ runner_token }}
-      RUNNER_NAME={{ hostname_result.stdout }}-runner  # Добавлено имя хоста для раннера
+      RUNNER_NAME={{ hostname_result.stdout }}
 
 - name: Run Docker Compose
   shell: docker compose up -d
