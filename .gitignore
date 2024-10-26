@@ -1,0 +1,3 @@
+MVC-DevOps/ansible/.vault_password.txt
+MVC-DevOps/ansible/roles/get_vault_password/
+.github/workflows/deploy_ansible_playbook.yml
