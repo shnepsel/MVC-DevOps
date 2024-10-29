@@ -31,9 +31,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_DB: bgrt
-      POSTGRES_USER: shnepsel
-      POSTGRES_PASSWORD: 111
+      POSTGRES_DB: arhiv
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
     volumes:
       - ./db_data:/var/lib/postgresql/data
     ports:
