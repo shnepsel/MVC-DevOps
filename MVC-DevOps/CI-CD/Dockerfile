@@ -1,43 +1,59 @@
-# Используем базовый образ с поддержкой CMake, компилятором и основными инструментами
+# Используем базовый образ Ubuntu 20.04
 FROM ubuntu:20.04
 
-# Устанавливаем основные зависимости
-RUN apt-get update && \
-    apt-get install -y \
-    cmake \
-    build-essential \
-    libpq-dev \
-    postgresql-server-dev-all \
-    libjsoncpp-dev \
-    libasio-dev \
-    wget \
-    curl \
-    unzip
+# Устанавливаем переменную окружения для неинтерактивной установки
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Установка и сборка только необходимых модулей Boost 1.86
+# Обновляем пакеты и устанавливаем основные зависимости
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        cmake \
+        build-essential \
+        libpq-dev \
+        postgresql-server-dev-all \
+        libjsoncpp-dev \
+        libasio-dev \
+        wget \
+        curl \
+        unzip \
+        python3-dev \
+        libicu-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libssl-dev \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Установка Boost 1.86
 RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
-    tar xzf boost_1_86_0.tar.gz && \
+    tar -xzf boost_1_86_0.tar.gz && \
     cd boost_1_86_0 && \
-    ./bootstrap.sh --prefix=/usr/local --with-libraries=system,filesystem,thread && \
-    ./b2 install -j$(nproc) --quiet && \
-    cd .. && rm -rf boost_1_86_0 boost_1_86_0.tar.gz
+    ./bootstrap.sh --prefix=/usr/local && \
+    ./b2 -j$(nproc) install && \
+    cd .. && \
+    rm -rf boost_1_86_0 boost_1_86_0.tar.gz && \
+    ldconfig
 
 # Установка и сборка libpqxx
 RUN wget https://github.com/jtv/libpqxx/archive/refs/tags/7.6.0.tar.gz && \
-    tar xzf 7.6.0.tar.gz && \
+    tar -xzf 7.6.0.tar.gz && \
     cd libpqxx-7.6.0 && \
-    cmake . && \
+    mkdir build && cd build && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release && \
     make -j$(nproc) && \
     make install && \
-    cd .. && rm -rf libpqxx-7.6.0 7.6.0.tar.gz
+    cd ../../ && \
+    rm -rf libpqxx-7.6.0 7.6.0.tar.gz && \
+    ldconfig
 
 # Устанавливаем Crow
-RUN wget https://github.com/CrowCpp/Crow/releases/download/v1.0+4/crow_all.h -P /usr/include/crow
+RUN mkdir -p /usr/include/crow && \
+    wget https://github.com/CrowCpp/Crow/releases/download/v1.0+4/crow_all.h -O /usr/include/crow/crow_all.h
 
 # Определяем рабочую директорию
 WORKDIR /app
 
-# Копируем проект в контейнер
+# Копируем файлы проекта в контейнер
 COPY . .
 
 # Устанавливаем переменные окружения для CMake
@@ -51,7 +67,7 @@ ENV ASIO_INCLUDE_DIR=/usr/include
 ENV CROW_INCLUDE_DIR=/usr/include/crow
 
 # Сборка проекта
-RUN cmake . && make
+RUN cmake . && make -j$(nproc)
 
 # Указываем команду запуска
 CMD ["./pg"]
