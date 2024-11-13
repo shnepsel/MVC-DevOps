@@ -1,10 +1,8 @@
-# Используем базовый образ Ubuntu 20.04
-FROM ubuntu:20.04
+# Этап 1: Сборка зависимостей
+FROM ubuntu:20.04 AS builder
 
-# Устанавливаем переменную окружения для неинтерактивной установки
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Обновляем пакеты и устанавливаем основные зависимости
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         cmake \
@@ -24,7 +22,7 @@ RUN apt-get update && \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Установка Boost 1.86
+# Установка Boost
 RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
     tar -xzf boost_1_86_0.tar.gz && \
     cd boost_1_86_0 && \
@@ -34,7 +32,7 @@ RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_
     rm -rf boost_1_86_0 boost_1_86_0.tar.gz && \
     ldconfig
 
-# Установка и сборка libpqxx
+# Установка libpqxx
 RUN wget https://github.com/jtv/libpqxx/archive/refs/tags/7.6.0.tar.gz && \
     tar -xzf 7.6.0.tar.gz && \
     cd libpqxx-7.6.0 && \
@@ -46,14 +44,28 @@ RUN wget https://github.com/jtv/libpqxx/archive/refs/tags/7.6.0.tar.gz && \
     rm -rf libpqxx-7.6.0 7.6.0.tar.gz && \
     ldconfig
 
-# Устанавливаем Crow
-RUN mkdir -p /usr/include/crow && \
-    wget https://github.com/CrowCpp/Crow/releases/download/v1.0+4/crow_all.h -O /usr/include/crow/crow_all.h
+# Этап 2: Финальный образ
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Устанавливаем только необходимые зависимости для выполнения
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq-dev \
+        libjsoncpp-dev \
+        libasio-dev \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Копируем Boost и libpqxx из этапа сборки
+COPY --from=builder /usr/local /usr/local
+COPY --from=builder /usr/include/crow/crow_all.h /usr/include/crow/crow_all.h
 
 # Определяем рабочую директорию
 WORKDIR /app
 
-# Копируем файлы проекта в контейнер
+# Копируем файлы проекта
 COPY . .
 
 # Устанавливаем переменные окружения для CMake
@@ -67,7 +79,10 @@ ENV ASIO_INCLUDE_DIR=/usr/include
 ENV CROW_INCLUDE_DIR=/usr/include/crow
 
 # Сборка проекта
-RUN cmake . && make -j$(nproc)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends cmake build-essential && \
+    rm -rf /var/lib/apt/lists/* && \
+    cmake . && make -j$(nproc)
 
 # Указываем команду запуска
 CMD ["./pg"]
