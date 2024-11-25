@@ -82,7 +82,6 @@ ENV PQXX_LIBRARY_DIR=/usr/local/lib
 ENV CROW_INCLUDE_DIR=/usr/include/crow
 
 # Сборка проекта
-# Сборка проекта
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake build-essential && \
     rm -rf /var/lib/apt/lists/* && \
@@ -90,7 +89,6 @@ RUN apt-get update && \
           -DCMAKE_PREFIX_PATH=/usr/local \
           -DBoost_USE_STATIC_LIBS=ON \
           -DBoost_USE_SHARED_LIBS=OFF \
-          -DBoost_USE_STATIC_RUNTIME=ON \
           -DBoost_INCLUDE_DIR=/usr/local/include \
           -DBoost_LIBRARY_DIR=/usr/local/lib . && \
     make -j$(nproc)
