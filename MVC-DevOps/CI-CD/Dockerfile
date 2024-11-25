@@ -23,12 +23,12 @@ RUN apt-get update && \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Установка Boost
+# Установка Boost с указанием нужных компонентов
 RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
     tar -xzf boost_1_86_0.tar.gz && \
     cd boost_1_86_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
-    ./b2 -j$(nproc) --with-system --with-filesystem --with-program_options install && \
+    ./b2 -j$(nproc) --with-system --with-filesystem --with-program_options --with-thread install && \
     cd .. && \
     rm -rf boost_1_86_0 boost_1_86_0.tar.gz && \
     ldconfig
@@ -88,7 +88,8 @@ RUN apt-get update && \
     cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
           -DCMAKE_PREFIX_PATH=/usr/local \
           -DBoost_USE_STATIC_LIBS=ON \
-          -DBoost_USE_SHARED_LIBS=OFF . && \
+          -DBoost_USE_SHARED_LIBS=OFF \
+          -DBoost_USE_STATIC_RUNTIME=ON . && \
     make -j$(nproc)
 
 # Указываем команду запуска
