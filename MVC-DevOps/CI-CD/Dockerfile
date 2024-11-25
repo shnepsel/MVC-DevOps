@@ -3,7 +3,7 @@ FROM ubuntu:20.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Установка базовых инструментов и библиотек
+# Установка необходимых инструментов
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         cmake \
@@ -54,7 +54,7 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Установка необходимых зависимостей
+# Установка необходимых библиотек
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libpq-dev \
@@ -63,31 +63,30 @@ RUN apt-get update && \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Копирование библиотек и заголовков из этапа сборки
+# Копируем зависимости из этапа сборки
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder /usr/include/crow/crow_all.h /usr/include/crow/crow_all.h
 
-# Рабочая директория
+# Определяем рабочую директорию
 WORKDIR /app
 
-# Копирование файлов проекта
+# Копируем файлы проекта
 COPY . .
 
-# Установка переменных окружения для CMake
+# Устанавливаем переменные окружения для CMake
+ENV BOOST_ROOT=/usr/local
+ENV BOOST_LIBRARYDIR=/usr/local/lib
+ENV BOOST_INCLUDEDIR=/usr/local/include
 ENV PQXX_INCLUDE_DIR=/usr/local/include
 ENV PQXX_LIBRARY_DIR=/usr/local/lib
-ENV PQ_LIBRARY_DIR=/usr/lib
-ENV BOOST_ROOT=/usr/local
-ENV BOOST_INCLUDE_DIR=/usr/local/include
-ENV NLOHMANN_JSON_DIR=/usr/include
-ENV ASIO_INCLUDE_DIR=/usr/include
 ENV CROW_INCLUDE_DIR=/usr/include/crow
 
 # Сборка проекта
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake build-essential && \
     rm -rf /var/lib/apt/lists/* && \
-    cmake -DCMAKE_BUILD_TYPE=Release . && make -j$(nproc)
+    cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_PREFIX_PATH=/usr/local . && \
+    make -j$(nproc)
 
-# Указание команды запуска
+# Указываем команду запуска
 CMD ["./pg"]
