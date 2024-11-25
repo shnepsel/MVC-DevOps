@@ -28,7 +28,7 @@ RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_
     tar -xzf boost_1_86_0.tar.gz && \
     cd boost_1_86_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
-    ./b2 -j$(nproc) install && \
+    ./b2 -j$(nproc) --with-system --with-filesystem --with-program_options install && \
     cd .. && \
     rm -rf boost_1_86_0 boost_1_86_0.tar.gz && \
     ldconfig
@@ -85,7 +85,10 @@ ENV CROW_INCLUDE_DIR=/usr/include/crow
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake build-essential && \
     rm -rf /var/lib/apt/lists/* && \
-    cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_PREFIX_PATH=/usr/local . && \
+    cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+          -DCMAKE_PREFIX_PATH=/usr/local \
+          -DBoost_USE_STATIC_LIBS=ON \
+          -DBoost_USE_SHARED_LIBS=OFF . && \
     make -j$(nproc)
 
 # Указываем команду запуска
