@@ -49,9 +49,6 @@ RUN wget https://github.com/jtv/libpqxx/archive/refs/tags/7.6.0.tar.gz && \
 RUN mkdir -p /usr/include/crow && \
     wget https://github.com/CrowCpp/Crow/releases/download/v1.0+4/crow_all.h -O /usr/include/crow/crow_all.h
 
-# Установка nlohmann_json
-RUN wget https://github.com/nlohmann/json/releases/download/v3.10.5/json.hpp -O /usr/include/nlohmann/json.hpp
-
 # Этап 2: Финальный образ
 FROM ubuntu:20.04
 
@@ -69,7 +66,6 @@ RUN apt-get update && \
 # Копируем зависимости из этапа сборки
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder /usr/include/crow/crow_all.h /usr/include/crow/crow_all.h
-COPY --from=builder /usr/include/nlohmann/json.hpp /usr/include/nlohmann/json.hpp
 
 # Определяем рабочую директорию
 WORKDIR /app
@@ -84,7 +80,6 @@ ENV BOOST_INCLUDEDIR=/usr/local/include
 ENV PQXX_INCLUDE_DIR=/usr/local/include
 ENV PQXX_LIBRARY_DIR=/usr/local/lib
 ENV CROW_INCLUDE_DIR=/usr/include/crow
-ENV NLOHMANN_JSON_DIR=/usr/include/nlohmann
 
 # Сборка проекта
 RUN apt-get update && \
