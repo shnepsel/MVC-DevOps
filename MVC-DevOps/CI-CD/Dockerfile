@@ -54,9 +54,12 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Установка необходимых библиотек
+# Установка зависимостей
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        cmake \
+        build-essential \
+        nlohmann-json3-dev \
         libpq-dev \
         libjsoncpp-dev \
         libasio-dev \
@@ -81,9 +84,6 @@ ENV PQXX_INCLUDE_DIR=/usr/local/include
 ENV PQXX_LIBRARY_DIR=/usr/local/lib
 ENV CROW_INCLUDE_DIR=/usr/include/crow
 
-# Скачиваем nlohmann_json вручную
-RUN wget https://github.com/nlohmann/json/releases/download/v3.11.2/json.hpp -O /usr/local/include/nlohmann/json.hpp
-
 # Сборка проекта
 RUN cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
           -DCMAKE_PREFIX_PATH=/usr/local \
@@ -93,5 +93,6 @@ RUN cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
           -DBoost_LIBRARY_DIR=/usr/local/lib \
           . && \
     make -j$(nproc)
+
 # Указываем команду запуска
 CMD ["./pg"]
