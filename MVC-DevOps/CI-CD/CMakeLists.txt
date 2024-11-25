@@ -23,15 +23,18 @@ link_directories(${PQXX_LIBRARY_DIR} ${PQ_LIBRARY_DIR})
 # Добавьте исполняемый файл
 add_executable(pg main.cpp)
 
-# Подключение Boost
-set (Boost_USE_STATIC_RUNTIME ON)
-find_package(Boost 1.86 REQUIRED COMPONENTS system filesystem thread)
+# Устанавливаем пути для поиска Boost
+set(BOOST_ROOT "/usr/local")
+set(BOOST_LIBRARYDIR "/usr/local/lib")
+set(BOOST_INCLUDEDIR "/usr/local/include")
 
+# Явно ищем компоненты Boost
+find_package(Boost REQUIRED COMPONENTS system filesystem program_options)
+
+# Если Boost найден, используем его
 if (Boost_FOUND)
-    include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-    target_link_libraries(pg ${Boost_LIBRARIES})
-else()
-    message("Boost not found")
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
 endif()
 
 # Подключение nlohmann_json
