@@ -44,6 +44,10 @@ RUN wget https://github.com/jtv/libpqxx/archive/refs/tags/7.6.0.tar.gz && \
     rm -rf libpqxx-7.6.0 7.6.0.tar.gz && \
     ldconfig
 
+# Установка Crow
+RUN mkdir -p /usr/include/crow && \
+    wget https://github.com/CrowCpp/Crow/releases/download/v1.0+4/crow_all.h -O /usr/include/crow/crow_all.h
+
 # Этап 2: Финальный образ
 FROM ubuntu:20.04
 
@@ -58,7 +62,7 @@ RUN apt-get update && \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Копируем Boost и libpqxx из этапа сборки
+# Копируем Boost, libpqxx и Crow из этапа сборки
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder /usr/include/crow/crow_all.h /usr/include/crow/crow_all.h
 
