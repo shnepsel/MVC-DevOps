@@ -3,6 +3,7 @@ FROM ubuntu:20.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Установка базовых инструментов и библиотек
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         cmake \
@@ -53,7 +54,7 @@ FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Устанавливаем только необходимые зависимости для выполнения
+# Установка необходимых зависимостей
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libpq-dev \
@@ -62,17 +63,17 @@ RUN apt-get update && \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Копируем Boost, libpqxx и Crow из этапа сборки
+# Копирование библиотек и заголовков из этапа сборки
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder /usr/include/crow/crow_all.h /usr/include/crow/crow_all.h
 
-# Определяем рабочую директорию
+# Рабочая директория
 WORKDIR /app
 
-# Копируем файлы проекта
+# Копирование файлов проекта
 COPY . .
 
-# Устанавливаем переменные окружения для CMake
+# Установка переменных окружения для CMake
 ENV PQXX_INCLUDE_DIR=/usr/local/include
 ENV PQXX_LIBRARY_DIR=/usr/local/lib
 ENV PQ_LIBRARY_DIR=/usr/lib
@@ -86,7 +87,7 @@ ENV CROW_INCLUDE_DIR=/usr/include/crow
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake build-essential && \
     rm -rf /var/lib/apt/lists/* && \
-    cmake . && make -j$(nproc)
+    cmake -DCMAKE_BUILD_TYPE=Release . && make -j$(nproc)
 
-# Указываем команду запуска
+# Указание команды запуска
 CMD ["./pg"]
