@@ -1,18 +1,26 @@
 # Этап 1: Сборка
 FROM ubuntu:22.04 AS build
 
-# Установим необходимые пакеты для сборки
+# Установим необходимые пакеты
 RUN apt-get update && apt-get install -y \
     cmake \
     build-essential \
-    libboost-all-dev \
     libpqxx-dev \
     libssl-dev \
     git \
     wget && \
     apt-get clean
 
-# Установим nlohmann_json и asio (если не встроено)
+# Установим Boost 1.86
+RUN mkdir -p /tmp/boost && \
+    cd /tmp/boost && \
+    wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
+    tar -xvzf boost_1_86_0.tar.gz && \
+    cd boost_1_86_0 && \
+    ./bootstrap.sh && ./b2 install && \
+    cd / && rm -rf /tmp/boost
+
+# Установим nlohmann_json и asio
 RUN mkdir -p /tmp && \
     cd /tmp && \
     git clone https://github.com/nlohmann/json.git && \
@@ -34,9 +42,6 @@ FROM ubuntu:22.04
 
 # Установим runtime зависимости
 RUN apt-get update && apt-get install -y \
-    libboost-system-dev \
-    libboost-filesystem-dev \
-    libboost-thread-dev \
     libpqxx-dev \
     libssl-dev && \
     apt-get clean
