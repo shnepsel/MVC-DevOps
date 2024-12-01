@@ -31,6 +31,13 @@ RUN mkdir -p /tmp && \
     tar -xvf asio-1-30-2.tar.gz && \
     cp -r asio-asio-1-30-2/asio/include/asio /usr/local/include
 
+# Установим Crow
+RUN mkdir -p /tmp/crow && \
+    cd /tmp/crow && \
+    git clone https://github.com/CrowCpp/Crow.git && \
+    cd Crow && cmake -DCMAKE_INSTALL_PREFIX=/usr/local . && make install && \
+    cd / && rm -rf /tmp/crow
+
 # Скопируем исходный код
 WORKDIR /app
 COPY . .
