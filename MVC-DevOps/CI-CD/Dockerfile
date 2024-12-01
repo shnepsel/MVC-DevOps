@@ -1,98 +1,51 @@
-# Этап 1: Сборка зависимостей
-FROM ubuntu:20.04 AS builder
+# Этап 1: Сборка
+FROM ubuntu:22.04 AS build
 
-ENV DEBIAN_FRONTEND=noninteractive
+# Установим необходимые пакеты для сборки
+RUN apt-get update && apt-get install -y \
+    cmake \
+    build-essential \
+    libboost-all-dev \
+    libpqxx-dev \
+    libssl-dev \
+    git \
+    wget && \
+    apt-get clean
 
-# Установка необходимых инструментов
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        cmake \
-        build-essential \
-        libpq-dev \
-        postgresql-server-dev-all \
-        libjsoncpp-dev \
-        libasio-dev \
-        wget \
-        curl \
-        unzip \
-        python3-dev \
-        libicu-dev \
-        libbz2-dev \
-        liblzma-dev \
-        libssl-dev \
-        ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+# Установим nlohmann_json и asio (если не встроено)
+RUN mkdir -p /tmp && \
+    cd /tmp && \
+    git clone https://github.com/nlohmann/json.git && \
+    cd json && cmake . && make install && \
+    cd /tmp && rm -rf json && \
+    wget https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-30-2.tar.gz && \
+    tar -xvf asio-1-30-2.tar.gz && \
+    cp -r asio-asio-1-30-2/asio/include/asio /usr/local/include
 
-# Установка Boost с указанием нужных компонентов
-RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
-    tar -xzf boost_1_86_0.tar.gz && \
-    cd boost_1_86_0 && \
-    ./bootstrap.sh --prefix=/usr/local && \
-    ./b2 -j$(nproc) --with-system --with-filesystem --with-program_options --with-thread install && \
-    cd .. && \
-    rm -rf boost_1_86_0 boost_1_86_0.tar.gz && \
-    ldconfig
-
-# Установка libpqxx
-RUN wget https://github.com/jtv/libpqxx/archive/refs/tags/7.6.0.tar.gz && \
-    tar -xzf 7.6.0.tar.gz && \
-    cd libpqxx-7.6.0 && \
-    mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release && \
-    make -j$(nproc) && \
-    make install && \
-    cd ../../ && \
-    rm -rf libpqxx-7.6.0 7.6.0.tar.gz && \
-    ldconfig
-
-# Установка Crow
-RUN mkdir -p /usr/include/crow && \
-    wget https://github.com/CrowCpp/Crow/releases/download/v1.0+4/crow_all.h -O /usr/include/crow/crow_all.h
-
-# Этап 2: Финальный образ
-FROM ubuntu:20.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Установка зависимостей
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        cmake \
-        build-essential \
-        nlohmann-json3-dev \
-        libpq-dev \
-        libjsoncpp-dev \
-        libasio-dev \
-        ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
-# Копируем зависимости из этапа сборки
-COPY --from=builder /usr/local /usr/local
-COPY --from=builder /usr/include/crow/crow_all.h /usr/include/crow/crow_all.h
-
-# Определяем рабочую директорию
+# Скопируем исходный код
 WORKDIR /app
-
-# Копируем файлы проекта
 COPY . .
 
-# Устанавливаем переменные окружения для CMake
-ENV BOOST_ROOT=/usr/local
-ENV BOOST_LIBRARYDIR=/usr/local/lib
-ENV BOOST_INCLUDEDIR=/usr/local/include
-ENV PQXX_INCLUDE_DIR=/usr/local/include
-ENV PQXX_LIBRARY_DIR=/usr/local/lib
-ENV CROW_INCLUDE_DIR=/usr/include/crow
+# Соберем проект
+RUN cmake . && make
 
-# Сборка проекта
-RUN cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
-          -DCMAKE_PREFIX_PATH=/usr/local \
-          -DBoost_USE_STATIC_LIBS=ON \
-          -DBoost_USE_SHARED_LIBS=OFF \
-          -DBoost_INCLUDE_DIR=/usr/local/include \
-          -DBoost_LIBRARY_DIR=/usr/local/lib \
-          . && \
-    make -j$(nproc)
+# Этап 2: Развертывание
+FROM ubuntu:22.04
 
-# Указываем команду запуска
+# Установим runtime зависимости
+RUN apt-get update && apt-get install -y \
+    libboost-system-dev \
+    libboost-filesystem-dev \
+    libboost-thread-dev \
+    libpqxx-dev \
+    libssl-dev && \
+    apt-get clean
+
+# Копируем скомпилированное приложение
+COPY --from=build /app/pg /usr/local/bin/pg
+
+# Указываем рабочую директорию
+WORKDIR /usr/local/bin
+
+# Запускаем приложение
 CMD ["./pg"]
