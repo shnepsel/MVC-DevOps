@@ -11,13 +11,14 @@ RUN apt-get update && apt-get install -y \
     wget && \
     apt-get clean
 
-# Установим Boost 1.86
+# Установим Boost 1.86 с поддержкой статической линковки
 RUN mkdir -p /tmp/boost && \
     cd /tmp/boost && \
     wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
     tar -xvzf boost_1_86_0.tar.gz && \
     cd boost_1_86_0 && \
-    ./bootstrap.sh && ./b2 install && \
+    ./bootstrap.sh --with-libraries=system,filesystem,thread --prefix=/usr/local && \
+    ./b2 install link=static runtime-link=static threading=multi && \
     cd / && rm -rf /tmp/boost
 
 # Установим nlohmann_json и asio
@@ -34,8 +35,8 @@ RUN mkdir -p /tmp && \
 WORKDIR /app
 COPY . .
 
-# Соберем проект
-RUN cmake . && make
+# Соберем проект с правильной конфигурацией Boost
+RUN cmake -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_STATIC_RUNTIME=ON . && make
 
 # Этап 2: Развертывание
 FROM ubuntu:22.04
