@@ -30,7 +30,7 @@ find_package(nlohmann_json REQUIRED)
 include_directories(${nlohmann_json_INCLUDE_DIRS})
 
 # Настройка Crow
-set(CROW_USE_BOOST OFF)
+set(CROW_INCLUDE_DIR "/usr/include/crow")
 include_directories(${CROW_INCLUDE_DIR})
 
 # Добавление исходных файлов
