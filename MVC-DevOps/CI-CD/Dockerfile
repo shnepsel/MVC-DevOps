@@ -18,26 +18,23 @@ RUN mkdir -p /tmp/boost && \
     tar -xvzf boost_1_86_0.tar.gz && \
     cd boost_1_86_0 && \
     ./bootstrap.sh --with-libraries=system,filesystem,thread --prefix=/usr/local && \
-    ./b2 install link=static runtime-link=static threading=multi && \
+    ./b2 install && \
     cd / && rm -rf /tmp/boost
 
-# Установим nlohmann_json и Asio
-RUN mkdir -p /tmp && \
-    cd /tmp && \
-    git clone https://github.com/nlohmann/json.git && \
-    cd json && cmake . && make install && \
-    cd /tmp && rm -rf json && \
-    wget https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-30-2.tar.gz && \
-    tar -xvf asio-1-30-2.tar.gz && \
-    cp -r asio-asio-1-30-2/asio/include/asio /usr/local/include && \
-    rm -rf /tmp/asio-1-30-2.tar.gz asio-asio-1-30-2
+# Установим Asio вручную
+RUN mkdir -p /tmp/asio && \
+    cd /tmp/asio && \
+    wget https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-30-0.tar.gz && \
+    tar -xvzf asio-1-30-0.tar.gz && \
+    cp -r asio-asio-1-30-0/asio/include/asio /usr/local/include && \
+    cd / && rm -rf /tmp/asio
 
 # Установим Crow
 RUN mkdir -p /tmp/crow && \
     cd /tmp/crow && \
     git clone https://github.com/CrowCpp/Crow.git && \
     cd Crow && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DASIO_INCLUDE_DIR=/usr/local/include . && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCROW_BUILD_EXAMPLES=OFF . && \
     make install && \
     cd / && rm -rf /tmp/crow
 
