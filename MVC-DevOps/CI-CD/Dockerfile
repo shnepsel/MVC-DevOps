@@ -8,10 +8,11 @@ RUN apt-get update && apt-get install -y \
     libpqxx-dev \
     libssl-dev \
     git \
-    wget && \
+    wget \
+    libasio-dev && \
     apt-get clean
 
-# Установим Boost 1.86 с поддержкой статической линковки
+# Установим Boost 1.86
 RUN mkdir -p /tmp/boost && \
     cd /tmp/boost && \
     wget https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.tar.gz && \
@@ -20,14 +21,6 @@ RUN mkdir -p /tmp/boost && \
     ./bootstrap.sh --with-libraries=system,filesystem,thread --prefix=/usr/local && \
     ./b2 install && \
     cd / && rm -rf /tmp/boost
-
-# Установим Asio вручную
-RUN mkdir -p /tmp/asio && \
-    cd /tmp/asio && \
-    wget https://github.com/chriskohlhoff/asio/archive/refs/tags/asio-1-30-0.tar.gz && \
-    tar -xvzf asio-1-30-0.tar.gz && \
-    cp -r asio-asio-1-30-0/asio/include/asio /usr/local/include && \
-    cd / && rm -rf /tmp/asio
 
 # Установим Crow
 RUN mkdir -p /tmp/crow && \
@@ -42,7 +35,7 @@ RUN mkdir -p /tmp/crow && \
 WORKDIR /app
 COPY . .
 
-# Соберем проект с правильной конфигурацией Boost
+# Соберем проект
 RUN cmake -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_STATIC_RUNTIME=ON . && make
 
 # Этап 2: Развертывание
