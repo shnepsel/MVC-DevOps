@@ -36,7 +36,7 @@ WORKDIR /app
 COPY . .
 
 # Соберем проект
-RUN cmake . && make
+RUN cmake -DBoost_INCLUDE_DIR=/usr/local/include -DBoost_LIBRARY_DIRS=/usr/local/lib . && make
 
 # Этап 2: Развертывание
 FROM ubuntu:22.04
