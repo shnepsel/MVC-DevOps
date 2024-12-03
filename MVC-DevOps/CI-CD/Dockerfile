@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     tar \
     bison \
+    flex \
     pkg-config \
     libssl-dev \
     libpq-dev \
