@@ -36,7 +36,7 @@ WORKDIR /app
 COPY . .
 
 # Соберем проект
-RUN cmake -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_STATIC_RUNTIME=ON . && make
+RUN cmake . && make
 
 # Этап 2: Развертывание
 FROM ubuntu:22.04
