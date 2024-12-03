@@ -10,7 +10,9 @@ set(PQ_LIBRARY_DIR "/usr/lib/postgresql")
 include_directories(${PQXX_INCLUDE_DIR})
 
 # Проверка наличия библиотеки libpq
-find_library(PQ_LIB NAMES pq PATHS ${PQ_LIBRARY_DIR} NO_DEFAULT_PATH)
+#find_library(PQ_LIB NAMES pq PATHS ${PQ_LIBRARY_DIR} NO_DEFAULT_PATH)
+find_library(PQ_LIB NAMES pq REQUIRED)
+find_path(PQ_INCLUDE_DIR NAMES libpq-fe.h REQUIRED)
 
 if(NOT PQ_LIB)
     message(FATAL_ERROR "libpq not found")
