@@ -1,25 +1,35 @@
 FROM ubuntu:22.04
 
-# Установка необходимых пакетов
+# Установка базовых инструментов
 RUN apt-get update && apt-get install -y \
-    cmake g++ libpqxx-dev libpq-dev libboost-all-dev \
-    wget git && \
+    build-essential cmake git curl wget unzip pkg-config \
+    libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Установка CMake
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.2/cmake-3.27.2-linux-x86_64.tar.gz && \
-    tar -xvzf cmake-3.27.2-linux-x86_64.tar.gz --strip 1 -C /usr/local
+# Установка vcpkg
+WORKDIR /opt
+RUN git clone https://github.com/microsoft/vcpkg.git && \
+    cd vcpkg && \
+    ./bootstrap-vcpkg.sh && \
+    ./vcpkg integrate install
 
-# Копируем проект
+# Установка зависимостей через vcpkg
+RUN /opt/vcpkg/vcpkg install crow libpqxx nlohmann-json
+
+# Устанавливаем переменные окружения для использования vcpkg в CMake
+ENV VCPKG_ROOT=/opt/vcpkg
+ENV CMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+# Копируем проект в контейнер
 WORKDIR /app
 COPY . .
 
 # Сборка проекта
 RUN mkdir build && cd build && \
-    cmake .. && \
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake && \
     cmake --build .
 
-# Указываем порт
+# Указываем порт для работы приложения
 EXPOSE 8080
 
 # Запуск приложения
