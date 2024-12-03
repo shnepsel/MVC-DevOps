@@ -1,6 +1,8 @@
 # Используем официальный образ для Ubuntu 20.04
 FROM ubuntu:20.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Устанавливаем необходимые пакеты для сборки
 RUN apt-get update && apt-get install -y \
     build-essential \
