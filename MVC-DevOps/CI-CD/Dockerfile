@@ -1,15 +1,15 @@
 # Используем официальный образ для Ubuntu 20.04
 FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Устанавливаем необходимые пакеты для сборки
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     git \
     curl \
-    wget \
+    zip \
+    unzip \
+    tar \
     pkg-config \
     libssl-dev \
     libpq-dev \
@@ -19,6 +19,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /root
 RUN git clone https://github.com/microsoft/vcpkg.git
 WORKDIR /root/vcpkg
+
+# Выполняем bootstrap для vcpkg
 RUN ./bootstrap-vcpkg.sh
 
 # Устанавливаем библиотеки через vcpkg
