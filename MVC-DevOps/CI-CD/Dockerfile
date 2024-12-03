@@ -1,25 +1,23 @@
-# Базовый образ
 FROM ubuntu:22.04
 
-# Установка необходимых инструментов
+# Установка необходимых пакетов
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    libboost-all-dev \
-    libpqxx-dev \
-    libnlohmann-json-dev \
-    pkg-config \
-    git \
-    && apt-get clean
+    cmake g++ libpqxx-dev libpq-dev libboost-all-dev \
+    wget git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Установка рабочей директории
+# Установка CMake
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.2/cmake-3.27.2-linux-x86_64.tar.gz && \
+    tar -xvzf cmake-3.27.2-linux-x86_64.tar.gz --strip 1 -C /usr/local
+
+# Копируем проект
 WORKDIR /app
-
-# Копируем проект в контейнер
 COPY . .
 
 # Сборка проекта
-RUN mkdir build && cd build && cmake .. && make
+RUN mkdir build && cd build && \
+    cmake .. && \
+    cmake --build .
 
 # Указываем порт
 EXPOSE 8080
