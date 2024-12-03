@@ -1,36 +1,39 @@
-FROM ubuntu:22.04
+# Используем официальный образ для Ubuntu 20.04
+FROM ubuntu:20.04
 
-# Установка базовых инструментов
+# Устанавливаем необходимые пакеты для сборки
 RUN apt-get update && apt-get install -y \
-    build-essential cmake git curl wget unzip pkg-config \
-    libssl-dev && \
-    rm -rf /var/lib/apt/lists/*
+    build-essential \
+    cmake \
+    git \
+    curl \
+    wget \
+    pkg-config \
+    libssl-dev \
+    libpq-dev \
+    libboost-all-dev
 
-# Установка vcpkg
-WORKDIR /opt
-RUN git clone https://github.com/microsoft/vcpkg.git && \
-    cd vcpkg && \
-    ./bootstrap-vcpkg.sh && \
-    ./vcpkg integrate install
+# Устанавливаем vcpkg
+WORKDIR /root
+RUN git clone https://github.com/microsoft/vcpkg.git
+WORKDIR /root/vcpkg
+RUN ./bootstrap-vcpkg.sh
 
-# Установка зависимостей через vcpkg
-RUN /opt/vcpkg/vcpkg install crow libpqxx nlohmann-json
+# Устанавливаем библиотеки через vcpkg
+RUN ./vcpkg install asio crow libpqxx nlohmann-json
 
-# Устанавливаем переменные окружения для использования vcpkg в CMake
-ENV VCPKG_ROOT=/opt/vcpkg
-ENV CMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake
+# Создаем директорию для проекта
+WORKDIR /src
+COPY . /src
 
-# Копируем проект в контейнер
-WORKDIR /app
-COPY . .
+# Указываем пути установки библиотек из vcpkg
+ENV VCPKG_ROOT=/root/vcpkg
+ENV CMAKE_TOOLCHAIN_FILE=/root/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-# Сборка проекта
-RUN mkdir build && cd build && \
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake && \
-    cmake --build .
-
-# Указываем порт для работы приложения
-EXPOSE 8080
+# Запуск конфигурации и сборки с использованием CMake
+WORKDIR /src/build
+RUN cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} ..
+RUN make
 
 # Запуск приложения
-CMD ["./build/pg"]
+CMD ["./pg"]
