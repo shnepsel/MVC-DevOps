@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     tar \
+    bison \
     pkg-config \
     libssl-dev \
     libpq-dev \
