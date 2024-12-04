@@ -1,64 +1,64 @@
 cmake_minimum_required(VERSION 3.10)
 project(MyProject)
 
-# Пути для зависимостей
-set(PQXX_INCLUDE_DIR "/usr/local/include")
-set(PQXX_LIBRARY_DIR "/usr/local/lib")
-set(PQ_LIBRARY_DIR "/usr/lib/postgresql")
+# Настройка пути к vcpkg
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Toolchain file for vcpkg")
 
-# Подключаем директории с заголовочными файлами
-include_directories(${PQXX_INCLUDE_DIR})
+# Установка статических библиотек и статического рантайма
+set(Boost_USE_STATIC_LIBS ON)       # Используем статические библиотеки Boost
+set(Boost_USE_STATIC_RUNTIME ON)    # Включаем статический рантайм
 
-# Проверка наличия библиотеки libpq
-#find_library(PQ_LIB NAMES pq PATHS ${PQ_LIBRARY_DIR} NO_DEFAULT_PATH)
-find_library(PQ_LIB NAMES pq REQUIRED)
-find_path(PQ_INCLUDE_DIR NAMES libpq-fe.h REQUIRED)
-
-if(NOT PQ_LIB)
-    message(FATAL_ERROR "libpq not found")
-else()
-    message("libpq found")
-endif()
-
-# Добавляем директории с библиотеками
-link_directories(${PQXX_LIBRARY_DIR} ${PQ_LIBRARY_DIR})
-
-# Указываем исполняемый файл
-add_executable(pg main.cpp)
-
-# Путь к Boost
-set(BOOST_ROOT "/usr/local/boost")
-set(BOOST_INCLUDE_DIR "/usr/local/include")
-set(Boost_USE_STATIC_RUNTIME ON)
-
-# Находим Boost
-find_package(Boost REQUIRED COMPONENTS system filesystem thread)
+# Найти и подключить Boost
+find_package(Boost 1.86 REQUIRED COMPONENTS system filesystem thread)
 
 if (Boost_FOUND)
-    include_directories(SYSTEM ${Boost_INCLUDE_DIR}) # подключаем заголовочные файлы Boost
-    target_link_libraries(pg Boost::Boost) # подключаем библиотеки Boost
+    include_directories(${Boost_INCLUDE_DIRS})
 else()
-    message("Boost not found")
+    message(FATAL_ERROR "Boost not found")
 endif()
 
-# Указываем пути для nlohmann_json
-set(nlohmann_json_INCLUDE_DIRS "/usr/local/include/nlohmann")
+# Настройка для libpqxx
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBPQ REQUIRED libpq)
+include_directories(${LIBPQ_INCLUDE_DIRS})
+link_directories(${LIBPQ_LIBRARY_DIRS})
+
+# Найти и подключить libpqxx
+find_package(libpqxx REQUIRED)
+include_directories(${libpqxx_INCLUDE_DIRS})
+
+# Подключение nlohmann-json
 find_package(nlohmann_json REQUIRED)
 
-# Подключаем nlohmann_json
-include_directories(${nlohmann_json_INCLUDE_DIRS})
+# Подключение Asio
+find_package(asio REQUIRED)
 
-# Указываем путь для ASIO
-set(ASIO_INCLUDE_DIR "/usr/local/include/asio")
-include_directories(${ASIO_INCLUDE_DIR})
-
-# Указываем путь для Crow
-set(CROW_INCLUDE_DIR "/usr/local/include/Crow")
-set(CROW_DIR "/usr/local/lib/cmake/Crow")
-
-# Включаем Crow
-include_directories(${CROW_INCLUDE_DIR})
+# Подключение Crow (если доступно через vcpkg)
 find_package(Crow REQUIRED)
 
-# Подключаем библиотеки
-target_link_libraries(pg pqxx libpq ${Boost_LIBRARIES} ${CROW_LIBRARIES} wsock32 ws2_32)
+# Установка директорий для библиотек
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${LIBPQ_INCLUDE_DIRS}
+    ${libpqxx_INCLUDE_DIRS}
+    ${asio_INCLUDE_DIRS}
+    ${Crow_INCLUDE_DIRS}
+    ${nlohmann_json_INCLUDE_DIRS}
+)
+
+# Укажите исполняемый файл
+add_executable(pg main.cpp)
+
+# Линковка статических библиотек
+target_link_libraries(pg
+    Boost::system
+    Boost::filesystem
+    Boost::thread
+    ${LIBPQ_LIBRARIES}
+    pqxx
+    asio
+    Crow::Crow
+    nlohmann_json::nlohmann_json
+    wsock32
+    ws2_32
+)
