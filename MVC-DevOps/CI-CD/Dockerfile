@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
     libpq-dev \
-    autoconf  # Добавлен недостающий пакет
+    autoconf
 
 # Устанавливаем vcpkg
 WORKDIR /root
@@ -25,8 +25,8 @@ RUN git clone https://github.com/microsoft/vcpkg.git
 WORKDIR /root/vcpkg
 RUN ./bootstrap-vcpkg.sh
 
-# Устанавливаем библиотеки через vcpkg с триплетом x64-linux
-RUN ./vcpkg install asio crow libpqxx nlohmann-json --triplet x64-linux
+# Устанавливаем библиотеки через vcpkg
+RUN ./vcpkg install asio crow libpqxx nlohmann-json boost-system boost-filesystem boost-thread --triplet x64-linux
 
 # Создаем директорию для проекта
 WORKDIR /src
