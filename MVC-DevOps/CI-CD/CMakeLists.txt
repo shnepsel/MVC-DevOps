@@ -3,28 +3,29 @@ project(pg)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Пути для vcpkg
+# Подключаем CMake toolchain для vcpkg
 set(CMAKE_TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake")
 
-# Добавляем зависимости
+# Поиск библиотек через vcpkg
 find_package(asio CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 find_package(libpqxx CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
 
-# Подключаем директории
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
-# Главный файл проекта
+# Указываем исходные файлы
 add_executable(${PROJECT_NAME} src/main.cpp)
 
-# Линковка библиотек
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        Boost::system
-        Boost::filesystem
-        Boost::thread
-        asio
-        pqxx
-        ${CMAKE_SOURCE_DIR}/lib/libcrow.a
+# Включаем необходимые директории
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+# Линкуем библиотеки
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Boost::system
+    Boost::filesystem
+    Boost::thread
+    pqxx
+    OpenSSL::SSL
+    OpenSSL::Crypto
 )
