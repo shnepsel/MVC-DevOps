@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
     flex \
     pkg-config \
     libssl-dev \
-    libpq-dev
+    libpq-dev \
+    autoconf  # Добавлен недостающий пакет
 
 # Устанавливаем vcpkg
 WORKDIR /root
