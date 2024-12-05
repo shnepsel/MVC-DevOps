@@ -37,10 +37,11 @@ COPY . /src
 # Указываем пути установки библиотек из vcpkg
 ENV VCPKG_ROOT=/root/vcpkg
 ENV CMAKE_TOOLCHAIN_FILE=/root/vcpkg/scripts/buildsystems/vcpkg.cmake
+ENV CMAKE_PREFIX_PATH=/root/vcpkg/installed/x64-linux
 
 # Запуск конфигурации и сборки с использованием CMake
 WORKDIR /src/build
-RUN cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DBoost_USE_STATIC_LIBS=OFF -DBoost_USE_STATIC_RUNTIME=OFF ..
+RUN cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH} -DBoost_USE_STATIC_LIBS=OFF -DBoost_USE_STATIC_RUNTIME=OFF ..
 RUN make
 
 # Запуск приложения
