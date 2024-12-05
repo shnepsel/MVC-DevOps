@@ -16,17 +16,18 @@ RUN apt-get update && apt-get install -y \
     flex \
     pkg-config \
     libssl-dev \
-    libpq-dev \
-    autoconf
+    libpq-dev
 
 # Устанавливаем vcpkg
 WORKDIR /root
 RUN git clone https://github.com/microsoft/vcpkg.git
 WORKDIR /root/vcpkg
+
+# Выполняем bootstrap для vcpkg
 RUN ./bootstrap-vcpkg.sh
 
-# Устанавливаем библиотеки через vcpkg
-RUN ./vcpkg install asio crow libpqxx nlohmann-json boost-system boost-filesystem boost-thread --triplet x64-linux
+# Устанавливаем библиотеки через vcpkg (динамическая версия)
+RUN ./vcpkg install asio crow libpqxx nlohmann-json boost-system boost-filesystem boost-thread
 
 # Создаем директорию для проекта
 WORKDIR /src
@@ -38,7 +39,7 @@ ENV CMAKE_TOOLCHAIN_FILE=/root/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 # Запуск конфигурации и сборки с использованием CMake
 WORKDIR /src/build
-RUN cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DBUILD_SHARED_LIBS=OFF ..
+RUN cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DBoost_USE_STATIC_LIBS=OFF -DBoost_USE_STATIC_RUNTIME=OFF ..
 RUN make
 
 # Запуск приложения
