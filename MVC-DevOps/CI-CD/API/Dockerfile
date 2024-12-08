@@ -27,7 +27,7 @@ WORKDIR /root/vcpkg
 # Выполняем bootstrap для vcpkg
 RUN ./bootstrap-vcpkg.sh
 
-# Устанавливаем библиотеки через vcpkg (динамическая версия)
+# Устанавливаем библиотеки через vcpkg
 RUN ./vcpkg install asio crow libpqxx nlohmann-json boost-system boost-filesystem boost-thread
 
 # Создаем директорию для проекта
@@ -43,6 +43,13 @@ ENV CMAKE_PREFIX_PATH=/root/vcpkg/installed/x64-linux
 WORKDIR /src/build
 RUN cmake -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DBoost_USE_STATIC_LIBS=OFF -DBoost_USE_STATIC_RUNTIME=OFF ..
 RUN make
+
+# Переменные окружения для подключения к базе данных
+ENV DB_HOST=bgrt
+ENV DB_PORT=5432
+ENV DB_NAME=arhiv
+ENV DB_USER=postgres
+ENV DB_PASSWORD=111
 
 # Запуск приложения
 CMD ["./pg"]

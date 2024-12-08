@@ -1,9 +1,9 @@
 {
     "db": {
-        "host": "<your_host>",
+        "host": "bgrt",
         "port": 5432,
         "dbname": "arhiv",
         "user": "postgres",
-        "password": "<your_password>"
+        "password": "111"
     }
 }
