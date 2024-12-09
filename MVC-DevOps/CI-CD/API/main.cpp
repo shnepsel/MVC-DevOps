@@ -70,10 +70,11 @@ json get_dataContracts(pqxx::connection& C) {
 
 // Обработчик для маршрута получения данных
 crow::response handle_get_data(pqxx::connection& C, int k) {
-    if(k==1)
+    if (k == 1)
         return crow::response(get_dataContracts(C).dump());
-    if(k==2)
+    if (k == 2)
         return crow::response(get_dataClients(C).dump());
+    return crow::response(400, "Invalid parameter"); // Код 400 — Bad Request
 }
 
 //--POST
