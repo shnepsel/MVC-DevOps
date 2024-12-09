@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     git \
     libpq-dev \
+    libboost-all-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
