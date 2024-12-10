@@ -1,6 +1,6 @@
 {
     "db": {
-        "host": "bgrt",
+        "host": "mvc-db",
         "port": 5432,
         "dbname": "arhiv",
         "user": "postgres",
