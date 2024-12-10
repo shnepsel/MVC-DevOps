@@ -10,13 +10,20 @@ RUN apt-get update && apt-get install -y \
     libboost-all-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Install Crow from source
+WORKDIR /crow
+RUN git clone https://github.com/CrowCpp/Crow.git . \
+    && mkdir build && cd build \
+    && cmake .. -DCROW_BUILD_EXAMPLES=OFF -DCROW_BUILD_TESTS=OFF \
+    && make install
+
+# Set working directory for your project
 WORKDIR /app
 
 # Copy source files and configuration
 COPY main.cpp CMakeLists.txt config.json ./
 
-# Build and install dependencies
+# Build your project
 RUN mkdir build && cd build \
     && cmake .. \
     && make
