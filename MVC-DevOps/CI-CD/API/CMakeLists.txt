@@ -8,14 +8,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Add external dependencies
 include(FetchContent)
 
+# Add nlohmann/json
 FetchContent_Declare(
     json
     URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
 )
 FetchContent_MakeAvailable(json)
 
+# Add libpqxx
+FetchContent_Declare(
+    libpqxx
+    GIT_REPOSITORY https://github.com/jtv/libpqxx.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(libpqxx)
+
 find_package(Crow REQUIRED)
-find_package(PostgreSQL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
 # Add executable
