@@ -25,7 +25,7 @@ COPY main.cpp CMakeLists.txt config.json ./
 
 # Build your project
 RUN mkdir build && cd build \
-    && cmake .. \
+    && cmake -DCMAKE_INCLUDE_PATH=/usr/include/boost .. \
     && make
 
 # Expose the application port

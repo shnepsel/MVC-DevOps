@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Crow REQUIRED)
 find_package(PostgreSQL REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
 
 # Add executable
 add_executable(api_server main.cpp)
@@ -18,5 +19,6 @@ target_link_libraries(api_server
     PUBLIC Crow::Crow 
     PUBLIC nlohmann_json::nlohmann_json
     PUBLIC pqxx
+    PUBLIC Boost::system
     pthread
 )
