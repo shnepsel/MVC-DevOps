@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     git \
     libpq-dev \
     libboost-all-dev \
+    libasio-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Crow from source
@@ -25,7 +26,7 @@ COPY main.cpp CMakeLists.txt config.json ./
 
 # Build your project
 RUN mkdir build && cd build \
-    && cmake -DCMAKE_INCLUDE_PATH=/usr/include/boost .. \
+    && cmake .. \
     && make
 
 # Expose the application port
