@@ -1,0 +1,49 @@
+name: Deploy API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t scelle/mvc-api .
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # Stop and remove the old container
+            if [ $(docker ps -q -f name=mvc-api) ]; then
+              docker stop mvc-api && docker rm mvc-api
+            fi
+
+            # Copy the Docker image to the server
+            docker save scelle/mvc-api | ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} docker load
+
+            # Run the new container
+            docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api
+
+            # Wait for the container to start and check its health
+            for i in {1..10}; do
+              if curl -s http://localhost/health | grep "OK" > /dev/null; then
+                echo "Container is healthy!"
+                exit 0
+              fi
+              echo "Waiting for container to become healthy... ($i/10)"
+              sleep 5
+            done
+
+            echo "Container failed to start or is unhealthy."
+            exit 1
