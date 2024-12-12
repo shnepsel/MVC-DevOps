@@ -15,6 +15,7 @@ jobs:
 
       - name: Build Docker image
         run: |
+          cd MVC-DevOps/CI-CD/API
           docker build -t scelle/mvc-api .
 
       - name: Deploy to server
