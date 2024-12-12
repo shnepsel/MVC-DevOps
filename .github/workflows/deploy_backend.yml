@@ -17,6 +17,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check Docker access
+        run: docker version
+
       - name: Build Docker image
         run: |
           cd MVC-DevOps/CI-CD/API
