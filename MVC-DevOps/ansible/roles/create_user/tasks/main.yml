@@ -1,0 +1,18 @@
+---
+- name: Ensure user github_runner exists
+  user:
+    name: github_runner
+    comment: "GitHub Actions Runner User"
+    shell: /bin/bash
+    createhome: yes
+
+- name: Add user to docker group
+  user:
+    name: github_runner
+    groups: docker
+    append: yes
+
+- name: Set password for github_runner (optional)
+  user:
+    name: github_runner
+    password: "{{ 'runner_password' | password_hash('sha512') }}"
