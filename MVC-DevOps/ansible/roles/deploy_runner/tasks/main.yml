@@ -36,5 +36,5 @@
   shell: docker compose up -d
   args:
     chdir: "{{ ansible_user_dir }}/docker-compose"
-  become: true
+  #become: true
   become_user: github_runner
