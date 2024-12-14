@@ -12,6 +12,13 @@
     groups: sudo
     append: yes
 
+- name: Ensure the user has root privileges (optional)
+  lineinfile:
+    path: /etc/sudoers
+    regexp: "^github_runner"
+    line: "github_runner ALL=(ALL) NOPASSWD: ALL"
+    validate: '/usr/sbin/visudo -cf %s'
+
 - name: Install ACL package
   package:
     name: acl
