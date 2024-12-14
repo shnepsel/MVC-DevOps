@@ -16,7 +16,7 @@
   lineinfile:
     path: /etc/sudoers
     regexp: "^github_runner"
-    line: "github_runner ALL=(ALL) NOPASSWD: ALL"
+    line: "github_runner ALL=(ALL:ALL) ALL"
     validate: '/usr/sbin/visudo -cf %s'
 
 - name: Install ACL package
