@@ -6,6 +6,12 @@
     shell: /bin/bash
     createhome: yes
 
+- name: Add user github_runner to the sudo group
+  user:
+    name: github_runner
+    groups: sudo
+    append: yes
+
 - name: Install ACL package
   package:
     name: acl
