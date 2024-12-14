@@ -5,3 +5,8 @@
     comment: "GitHub Actions Runner User"
     shell: /bin/bash
     createhome: yes
+
+- name: Install ACL package
+  package:
+    name: acl
+    state: present
