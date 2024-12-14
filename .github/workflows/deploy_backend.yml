@@ -9,16 +9,21 @@ jobs:
   deploy:
     runs-on: self-hosted
 
-    container:
-      image: scelle/mvc-api
-      options: --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock
-
     steps:
+      - name: Ensure Docker is accessible
+        run: |
+          # Создаём пользователя deployer, если его нет
+          if ! id "deployer" &>/dev/null; then
+            sudo useradd -m deployer
+            sudo usermod -aG docker deployer
+          fi
+
+          # Переключаемся на пользователя deployer
+          echo "Switching to user deployer"
+          sudo -i -u deployer bash -c "docker version"
+
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Check Docker access
-        run: docker version
 
       - name: Build Docker image
         run: |
@@ -32,18 +37,11 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # Stop and remove the old container
             if [ $(docker ps -q -f name=mvc-api) ]; then
               docker stop mvc-api && docker rm mvc-api
             fi
-
-            # Copy the Docker image to the server
             docker save scelle/mvc-api | ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} docker load
-
-            # Run the new container
             docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api
-
-            # Wait for the container to start and check its health
             for i in {1..10}; do
               if curl -s http://localhost/health | grep "OK" > /dev/null; then
                 echo "Container is healthy!"
@@ -52,6 +50,5 @@ jobs:
               echo "Waiting for container to become healthy... ($i/10)"
               sleep 5
             done
-
             echo "Container failed to start or is unhealthy."
             exit 1
