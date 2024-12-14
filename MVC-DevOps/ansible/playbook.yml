@@ -1,5 +1,5 @@
 ---
-- hosts: servers
+- hosts: localhost
   become: true
   roles:
     - manage_files
