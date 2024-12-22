@@ -11,8 +11,8 @@ jobs:
 
     steps:
       - name: Change docker socket owner
-      run: |
-        sudo chown :docker /var/run/docker.sock
+        run: |
+          sudo chown :docker /var/run/docker.sock
 
       - name: Switch to runner user
         run: |
