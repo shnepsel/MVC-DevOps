@@ -19,28 +19,16 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd MVC-DevOps/CI-CD/API
-          docker build -t scelle/mvc-api .
+          sudo -i -u runner bash -c "cd MVC-DevOps/CI-CD/API && docker build -t scelle/mvc-api ."
 
       - name: Stop and remove old container
         run: |
-          if [ $(docker ps -q -f name=mvc-api) ]; then
-            docker stop mvc-api && docker rm mvc-api
-          fi
+          sudo -i -u runner bash -c "if [ \$(docker ps -q -f name=mvc-api) ]; then docker stop mvc-api && docker rm mvc-api; fi"
 
       - name: Run new container
         run: |
-          docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api
+          sudo -i -u runner bash -c "docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api"
 
       - name: Check container health
         run: |
-          for i in {1..10}; do
-            if curl -s http://localhost/health | grep "OK" > /dev/null; then
-              echo "Container is healthy!"
-              exit 0
-            fi
-            echo "Waiting for container to become healthy... ($i/10)"
-            sleep 5
-          done
-          echo "Container failed to start or is unhealthy."
-          exit 1
+          sudo -i -u runner bash -c "for i in {1..10}; do if curl -s http://localhost/health | grep \"OK\" > /dev/null; then echo \"Container is healthy!\" && exit 0; fi; echo \"Waiting for container to become healthy... (\$i/10)\"; sleep 5; done; echo \"Container failed to start or is unhealthy.\" && exit 1"

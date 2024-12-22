@@ -4,7 +4,7 @@
   roles:
     - manage_files
 #    - create_user
-    - install_docker
+#    - install_docker
     - deploy_runner
   vars:
     github_owner: "shnepsel"
