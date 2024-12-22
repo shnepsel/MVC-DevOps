@@ -32,9 +32,7 @@
       RUNNER_TOKEN={{ runner_token }}
       RUNNER_NAME={{ hostname_result.stdout }}
 
-- name: Run Docker Compose as github_runner
+- name: Run Docker Compose
   shell: docker compose up -d
   args:
     chdir: "{{ ansible_user_dir }}/docker-compose"
-  #become: true
-  become_user: github_runner
