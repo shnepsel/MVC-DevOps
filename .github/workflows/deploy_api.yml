@@ -10,6 +10,10 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Switch to runner user
+        run: |
+          sudo -i -u runner bash -c "whoami"
+
       - name: Checkout code
         uses: actions/checkout@v4
 
