@@ -10,18 +10,6 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Ensure Docker is accessible
-        run: |
-          # Создаём пользователя deployer, если его нет
-          if ! id "deployer" &>/dev/null; then
-            sudo useradd -m deployer
-            sudo usermod -aG docker deployer
-          fi
-
-          # Переключаемся на пользователя deployer и обновляем группы
-          echo "Switching to user deployer"
-          sudo -i -u deployer bash -c "newgrp docker && docker version"
-
       - name: Checkout code
         uses: actions/checkout@v4
 

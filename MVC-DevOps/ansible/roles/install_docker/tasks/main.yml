@@ -4,7 +4,7 @@
 
 - name: Add user to docker group
   user:
-    name: github_runner
+    name: runner
     groups: docker
     append: yes
 
