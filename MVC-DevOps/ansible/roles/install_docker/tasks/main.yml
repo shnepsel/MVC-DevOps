@@ -2,13 +2,13 @@
 - name: Install Docker
   shell: curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
 
-- name: Add user to docker group
-  user:
-    name: runner
-    groups: docker
-    append: yes
+# - name: Add user to docker group
+#   user:
+#     name: runner
+#     groups: docker
+#     append: yes
 
-- name: Restart Docker
-  service:
-    name: docker
-    state: restarted
+# - name: Restart Docker
+#   service:
+#     name: docker
+#     state: restarted

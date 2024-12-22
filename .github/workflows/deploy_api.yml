@@ -10,6 +10,10 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Change docker socket owner
+      run: |
+        sudo chown :docker /var/run/docker.sock
+
       - name: Switch to runner user
         run: |
           sudo -i -u runner bash -c "whoami"
@@ -19,16 +23,28 @@ jobs:
 
       - name: Build Docker image
         run: |
-          sudo -i -u runner bash -c "cd MVC-DevOps/CI-CD/API && docker build -t scelle/mvc-api ."
+          cd MVC-DevOps/CI-CD/API
+          docker build -t scelle/mvc-api .
 
       - name: Stop and remove old container
         run: |
-          sudo -i -u runner bash -c "if [ \$(docker ps -q -f name=mvc-api) ]; then docker stop mvc-api && docker rm mvc-api; fi"
+          if [ $(docker ps -q -f name=mvc-api) ]; then
+            docker stop mvc-api && docker rm mvc-api
+          fi
 
       - name: Run new container
         run: |
-          sudo -i -u runner bash -c "docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api"
+          docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api
 
       - name: Check container health
         run: |
-          sudo -i -u runner bash -c "for i in {1..10}; do if curl -s http://localhost/health | grep \"OK\" > /dev/null; then echo \"Container is healthy!\" && exit 0; fi; echo \"Waiting for container to become healthy... (\$i/10)\"; sleep 5; done; echo \"Container failed to start or is unhealthy.\" && exit 1"
+          for i in {1..10}; do
+            if curl -s http://localhost/health | grep "OK" > /dev/null; then
+              echo "Container is healthy!"
+              exit 0
+            fi
+            echo "Waiting for container to become healthy... ($i/10)"
+            sleep 5
+          done
+          echo "Container failed to start or is unhealthy."
+          exit 1
