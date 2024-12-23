@@ -209,11 +209,11 @@ int main() {
     }
 
     const auto& db_config = config["db"];
-    std::string conn_str = "host=mvc-db" +
-                           " port=5432" +
-                           " dbname=arhiv" +
-                           " user=postgres" +
-                           " password=111";
+    std::string conn_str = "host=" + db_config["host"].get<std::string>() +
+                           " port=" + std::to_string(db_config["port"].get<int>()) +
+                           " dbname=" + db_config["dbname"].get<std::string>() +
+                           " user=" + db_config["user"].get<std::string>() +
+                           " password=" + db_config["password"].get<std::string>();
 
     pqxx::connection C;
     try {
