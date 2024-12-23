@@ -49,7 +49,7 @@ json get_dataClientID(pqxx::connection& C, int client_id) {
 
         pqxx::result R = W.exec_prepared("select_client_by_id", client_id);
 
-        if (R.empty() || R[0]["is_deleted"].as<bool>()) {
+        if (R.empty()  R[0]["is_deleted"].as<bool>()) {
             return client; // Пустой JSON, если клиент не найден или удалён
         }
 
@@ -71,7 +71,7 @@ json get_dataClientID(pqxx::connection& C, int client_id) {
 // --- POST: Добавление клиента ---
 crow::response add_client(pqxx::connection& C, const json& client_data) {
     try {
-        if (!client_data.contains("client_name") || !client_data.contains("phone_number")) {
+        if (!client_data.contains("client_name")  !client_data.contains("phone_number")) {
             return crow::response(400, "Некорректные данные клиента.");
         }
 
@@ -89,20 +89,6 @@ crow::response add_client(pqxx::connection& C, const json& client_data) {
     }
 }
 
-// --- DELETE: Логическое удаление клиента ---
-crow::response delete_client(pqxx::connection& C, int client_id) {
-    try {
-        pqxx::work W(C);
-
-        W.exec_prepared("delete_client", client_id);
-        W.commit();
-
-        return crow::response(200, "Клиент успешно удалён.");
-    } catch (const std::exception& e) {
-        std::cerr << "Ошибка при удалении клиента: " << e.what() << std::endl;
-        return crow::response(500, "Ошибка на сервере.");
-    }
-}
 
 // --- GET: Получение всех контрактов ---
 json get_contracts(pqxx::connection& C) {
@@ -136,8 +122,7 @@ json get_contract_by_id(pqxx::connection& C, int contract_id) {
         pqxx::work W(C);
 
         pqxx::result R = W.exec_prepared("select_contract_by_id", contract_id);
-
-        if (R.empty() || R[0]["is_deleted"].as<bool>()) {
+if (R.empty()  R[0]["is_deleted"].as<bool>()) {
             return contract; // Пустой JSON, если контракт не найден или удалён
         }
 
@@ -161,8 +146,8 @@ json get_contract_by_id(pqxx::connection& C, int contract_id) {
 // --- POST: Добавление контракта ---
 crow::response add_contract(pqxx::connection& C, const json& contract_data) {
     try {
-        if (!contract_data.contains("client_id") || !contract_data.contains("contract_details") ||
-            !contract_data.contains("start_date") || !contract_data.contains("end_date")) {
+        if (!contract_data.contains("client_id")  !contract_data.contains("contract_details") 
+            !contract_data.contains("start_date")  !contract_data.contains("end_date")) {
             return crow::response(400, "Некорректные данные контракта.");
         }
 
@@ -182,46 +167,10 @@ crow::response add_contract(pqxx::connection& C, const json& contract_data) {
     }
 }
 
-// --- DELETE: Логическое удаление контракта ---
-crow::response delete_contract(pqxx::connection& C, int contract_id) {
-    try {
-        pqxx::work W(C);
-
-        W.exec_prepared("delete_contract", contract_id);
-        W.commit();
-
-        return crow::response(200, "Контракт успешно удалён.");
-    } catch (const std::exception& e) {
-        std::cerr << "Ошибка при удалении контракта: " << e.what() << std::endl;
-        return crow::response(500, "Ошибка на сервере.");
-    }
-}
 
 int main() {
     crow::SimpleApp app;
-
-    json config;
-    try {
-        config = load_config("config.json");
-    } catch (const std::exception& e) {
-        std::cerr << "Ошибка загрузки конфигурации: " << e.what() << std::endl;
-        return 1;
-    }
-
-    const auto& db_config = config["db"];
-    std::string conn_str = "host=" + db_config["host"].get<std::string>() +
-                           " port=" + std::to_string(db_config["port"].get<int>()) +
-                           " dbname=" + db_config["dbname"].get<std::string>() +
-                           " user=" + db_config["user"].get<std::string>() +
-                           " password=" + db_config["password"].get<std::string>();
-
-    pqxx::connection C;
-    try {
-        C = pqxx::connection(conn_str);
-    } catch (const std::exception& e) {
-        std::cerr << "Ошибка подключения к базе данных: " << e.what() << std::endl;
-        return 1;
-    }
+    pqxx::connection C("host=localhost port=5432 dbname=postgres user=postgres password=jorji");
 
     // Подготовка SQL-запросов
     C.prepare("insert_clients", "INSERT INTO clients (client_name, phone_number) VALUES ($1, $2)");
@@ -278,14 +227,5 @@ int main() {
             return crow::response(400, "Некорректный JSON.");
         }
     });
-
-    CROW_ROUTE(app, "/delete/Client/<int>").methods(crow::HTTPMethod::DELETE)([&C](int client_id) {
-        return delete_client(C, client_id);
-    });
-
-    CROW_ROUTE(app, "/delete/Contract/<int>").methods(crow::HTTPMethod::DELETE)([&C](int contract_id) {
-        return delete_contract(C, contract_id);
-    });
-
-    app.port(8080).multithreaded().run();
+app.port(8080).multithreaded().run();
 }
