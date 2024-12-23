@@ -170,7 +170,7 @@ crow::response add_contract(pqxx::connection& C, const json& contract_data) {
 
 int main() {
     crow::SimpleApp app;
-    pqxx::connection C("host=localhost port=5432 dbname=postgres user=postgres password=jorji");
+    pqxx::connection C("host=mvc-db port=5432 dbname=arhiv user=postgres password=111");
 
     // Подготовка SQL-запросов
     C.prepare("insert_clients", "INSERT INTO clients (client_name, phone_number) VALUES ($1, $2)");
