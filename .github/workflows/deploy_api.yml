@@ -21,6 +21,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create Docker network
+        run: |
+          if ! docker network inspect server-net > /dev/null 2>&1; then
+            docker network create server-net
+          fi
+
       - name: Build Docker image
         run: |
           cd MVC-DevOps/CI-CD/API
