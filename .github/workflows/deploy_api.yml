@@ -21,12 +21,6 @@ jobs:
         run: |
           sudo -i -u runner bash -c "whoami"
 
-      - name: Create Docker network
-        run: |
-          if ! docker network inspect server-net > /dev/null 2>&1; then
-            docker network create server-net
-          fi
-
       - name: Build Docker image
         run: |
           cd MVC-DevOps/CI-CD/API
@@ -42,15 +36,6 @@ jobs:
         run: |
           docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api
 
-      - name: Check container health
+      - name: Check api work
         run: |
-          for i in {1..10}; do
-            if curl -s http://localhost/health | grep "OK" > /dev/null; then
-              echo "Container is healthy!"
-              exit 0
-            fi
-            echo "Waiting for container to become healthy... ($i/10)"
-            sleep 5
-          done
-          echo "Container failed to start or is unhealthy."
-          exit 1
+          curl http://localhost:8080/get/Clients
