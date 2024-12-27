@@ -10,6 +10,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Change docker socket owner
         run: |
           sudo chown :docker /var/run/docker.sock
@@ -17,9 +20,6 @@ jobs:
       - name: Switch to runner user
         run: |
           sudo -i -u runner bash -c "whoami"
-
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Create Docker network
         run: |
@@ -34,7 +34,7 @@ jobs:
 
       - name: Stop and remove old container
         run: |
-          if [ $(docker ps -q -f name=mvc-api) ]; then
+          if docker ps -a --format '{{.Names}}' | grep -q '^mvc-api$'; then
             docker stop mvc-api && docker rm mvc-api
           fi
 
