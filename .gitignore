@@ -1,2 +1,3 @@
 MVC-DevOps/ansible/.vault_password.txt
 .github/workflows/deploy_ansible.yml
+MVC-DevOps/ansible/roles/create_user/

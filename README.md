@@ -1,0 +1,1 @@
+[![Deploy API](https://github.com/shnepsel/MVC-DevOps/actions/workflows/deploy_api.yml/badge.svg)](https://github.com/shnepsel/MVC-DevOps/actions/workflows/deploy_api.yml)
