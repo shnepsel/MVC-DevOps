@@ -15,6 +15,16 @@ INSERT INTO clients (client_name, phone_number) VALUES
 ('Fiona Miller', '890-123-4567'),
 ('George Wilson', '901-234-5678'),
 ('Hannah Lee', '012-345-6789');
+('John Doe', '123-456-7890'),
+('Jane Smith', '234-567-8901'),
+('Alice Johnson', '345-678-9012'),
+('Bob Brown', '456-789-0123'),
+('Charlie Davis', '567-890-1234'),
+('Diana Evans', '678-901-2345'),
+('Ethan Harris', '789-012-3456'),
+('Fiona Miller', '890-123-4567'),
+('George Wilson', '901-234-5678'),
+('Hannah Lee', '012-345-6789');
 
 
 CREATE TABLE contracts (
@@ -38,3 +48,8 @@ INSERT INTO contracts (id, client_id, description, product_type_id, start_date, 
 (8, 7, 'Credit Agreement with Kuznetsova M.V.', 1, '2017-09-01', '2020-01-01', NULL),
 (9, 6, 'Deposit Agreement with Mironov A.P.', 2, '2019-01-10', NULL, NULL),
 (10, 7, 'Deposit Agreement with Kuznetsova M.V.', 2, '2019-02-15', NULL, NULL);
+(11, 5, 'Card Agreement with Kozlov A.P.', 3, '2018-02-20', NULL, NULL),
+(12, 6, 'Credit Agreement with Mironov A.P.', 1, '2018-05-01', NULL, NULL),
+(13, 7, 'Credit Agreement with Kuznetsova M.V.', 1, '2017-09-01', '2020-01-01', NULL),
+(14, 6, 'Deposit Agreement with Mironov A.P.', 2, '2019-01-10', NULL, NULL),
+(15, 7, 'Deposit Agreement with Kuznetsova M.V.', 2, '2019-02-15', NULL, NULL);

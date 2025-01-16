@@ -1,0 +1,13 @@
+modules:
+  http_2xx-general: # название модуля
+    prober: http # тип проверки
+    timeout: 10s # таймаут
+    http: # тип проверки
+      valid_status_codes: [200,302,301] # Валидные статус коды
+      method: GET # http метод для проверки
+      no_follow_redirects: false 
+      fail_if_ssl: false # фейлится если ssl
+      fail_if_not_ssl: false # фейлится если нет ssl
+      preferred_ip_protocol: "ip4"
+      tls_config: 
+        insecure_skip_verify: false
