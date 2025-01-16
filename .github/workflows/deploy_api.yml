@@ -38,4 +38,4 @@ jobs:
 
       - name: Check api work
         run: |
-          curl http://109.206.241.154:8080/get/Clients
+          curl http://45.144.235.149:8080/get/Clients
