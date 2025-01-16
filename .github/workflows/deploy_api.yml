@@ -34,7 +34,7 @@ jobs:
 
       - name: Run new container
         run: |
-          docker run -d --name mvc-api --network server-net -p 8080:8080 scelle/mvc-api
+          docker run -d --name mvc-api -p 8080:8080 scelle/mvc-api
 
       - name: Check api work
         run: |
