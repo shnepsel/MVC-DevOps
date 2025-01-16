@@ -1,0 +1,37 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  # Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # NGINX Exporter
+  - job_name: 'nginx_exporter'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+
+  # Blackbox Exporter
+  - job_name: 'blackbox-http_2xx-general'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: [http_2xx-general]
+    static_configs:
+      - targets:
+        - http://45.144.235.149:8080/
+        - http://45.144.235.149:8080/get/Clients
+        - http://45.144.235.149:8080/get/Contracts
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

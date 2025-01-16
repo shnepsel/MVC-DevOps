@@ -21,6 +21,16 @@ CREATE TABLE contracts (
 -- Вставка начальных данных в таблицу clients
 INSERT INTO clients (client_name, phone_number) VALUES
 ('John Doe', '123-456-7890'),
+('Jane Smith', '234-567-8901'),
+('Alice Johnson', '345-678-9012'),
+('Bob Brown', '456-789-0123'),
+('Charlie Davis', '567-890-1234'),
+('Diana Evans', '678-901-2345'),
+('Ethan Harris', '789-012-3456'),
+('Fiona Miller', '890-123-4567'),
+('George Wilson', '901-234-5678'),
+('Hannah Lee', '012-345-6789');
+('John Doe', '123-456-7890'),
 ('Jane Smith', '987-654-3210'),
 ('Alice Johnson', '555-555-5555');
 
