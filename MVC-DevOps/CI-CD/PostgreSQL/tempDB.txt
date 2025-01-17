@@ -29,9 +29,6 @@ INSERT INTO clients (client_name, phone_number) VALUES
 ('Ethan Harris', '789-012-3456'),
 ('Fiona Miller', '890-123-4567'),
 ('George Wilson', '901-234-5678'),
-('Hannah Lee', '012-345-6789');
-('John Doe', '123-456-7890'),
-('Jane Smith', '987-654-3210'),
 ('Alice Johnson', '555-555-5555'),
 ('Uma White', '109-876-5432'),
 ('Victor Green', '987-654-3210'),
