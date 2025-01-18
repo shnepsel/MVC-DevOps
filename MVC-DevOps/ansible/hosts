@@ -1,5 +1,5 @@
 [servers]
-weasel-server ansible_host=109.206.241.154 
+weasel-server ansible_host=45.144.235.149
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3

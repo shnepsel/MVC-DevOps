@@ -1,4 +1,4 @@
-name: Deploy API
+name: Deploy PostgresDB
 
 on:
   workflow_dispatch:
@@ -21,19 +21,15 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd MVC-DevOps/CI-CD/API
-          docker build -t scelle/mvc-api .
+          cd MVC-DevOps/CI-CD/PostgreSQL
+          docker build -t scelle/mvc-db .
 
       - name: Stop and remove old container
         run: |
-          if docker ps -a --format '{{.Names}}' | grep -q '^mvc-api$'; then
-            docker stop mvc-api && docker rm mvc-api
+          if docker ps -a --format '{{.Names}}' | grep -q '^mvc-db$'; then
+            docker stop mvc-db && docker rm mvc-db
           fi
 
       - name: Run new container
         run: |
-          docker run -d --name mvc-api -p 8080:8080 scelle/mvc-api
-
-      - name: Check api work
-        run: |
-          curl http://45.144.235.149:8080/get/Clients
+          docker run -d --name mvc-api -p 5432:5432 scelle/mvc-db
